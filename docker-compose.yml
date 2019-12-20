@@ -1,0 +1,34 @@
+version: '3.7'
+services:
+  gfs4-downloader:
+    image: "otrojota/geoportal:gfs4"
+    volumes:
+      - type: bind
+        source: /var/geoportal/gfs4/data
+        target: /home/data
+      - type: bind
+        source: /var/geoportal/gfs4/publish
+        target: /home/publish
+    environment:
+      DOWNLOADER: "true"
+    deploy:
+        mode: replicated
+        replicas: 1
+        restart_policy:
+          condition: on-failure
+  gfs4-server:
+    ports:
+      - "8081:8081"
+    image: "otrojota/geoportal:gfs4"
+    volumes:
+      - type: bind
+        source: /var/geoportal/gfs4/data
+        target: /home/data
+      - type: bind
+        source: /var/geoportal/gfs4/publish
+        target: /home/publish
+    deploy:
+        mode: replicated
+        replicas: 4
+        restart_policy:
+          condition: on-failure
