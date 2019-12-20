@@ -32,3 +32,12 @@ services:
         replicas: 4
         restart_policy:
           condition: on-failure
+  web-server:
+    ports:
+      - "8085:8085"
+    image: "otrojota/geoportal:web-server"
+    deploy:
+        mode: replicated
+        replicas: 2
+        restart_policy:
+          condition: on-failure
