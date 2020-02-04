@@ -3,7 +3,7 @@
 version: '3.7'
 services:
   gfs4-downloader:
-    image: "otrojota/geoportal:gfs4"
+    image: "otrojota/geoportal:gfs4-0.11"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -21,7 +21,7 @@ services:
   gfs4-server:
     ports:
       - "8081:8081"
-    image: "otrojota/geoportal:gfs4"
+    image: "otrojota/geoportal:gfs4-0.11"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -37,7 +37,7 @@ services:
   web-server:
     ports:
       - "8085:8085"
-    image: "otrojota/geoportal:web-server-0.14"
+    image: "otrojota/geoportal:web-server-0.15"
     deploy:
         mode: replicated
         replicas: 2
