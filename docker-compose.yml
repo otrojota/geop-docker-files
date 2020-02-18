@@ -3,7 +3,7 @@
 version: '3.7'
 services:
   gfs4-downloader:
-    image: "otrojota/geoportal:gfs4-0.11"
+    image: "otrojota/geoportal:gfs4-0.17"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -21,7 +21,7 @@ services:
   gfs4-server:
     ports:
       - "8081:8081"
-    image: "otrojota/geoportal:gfs4-0.11"
+    image: "otrojota/geoportal:gfs4-0.17"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -34,10 +34,44 @@ services:
         replicas: 4
         restart_policy:
           condition: on-failure
+  mongo:
+    image: "mongo:4.2.3-bionic"
+    volumes:
+      - type: bind
+        source: /var/geoportal/mongoData
+        target: /data/db
+    deploy:
+        mode: replicated
+        replicas: 1
+        placement:
+          constraints: [node.role == manager]
+        restart_policy:
+            condition: on-failure
+        resources:
+            reservations:
+                memory: 512M
+            limits:
+                memory: 4096M
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: pomeo
+  servimet-downloader:
+        ports:
+          - "8083:8083"
+        image: "otrojota/geoportal:servimet-0.15"
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+        environment:
+            MONGO_URL: "mongodb://root:pomeo@mongo:27017"
+            MONGO_DATABASE: "servimet"
+            DOWNLOADER: "true"
   web-server:
     ports:
-      - "8085:8085"
-    image: "otrojota/geoportal:web-server-0.15"
+      - "8082:8085"
+    image: "otrojota/geoportal:web-server-0.22"
     deploy:
         mode: replicated
         replicas: 2
