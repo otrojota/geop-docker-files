@@ -1,9 +1,12 @@
 # docker stack ps geoportal
 # docker stack deploy --compose-file docker-compose.yml --with-registry-auth geoportal
+#
 version: '3.7'
 services:
+  ###
+  ### gfs4-downloader
   gfs4-downloader:
-    image: "otrojota/geoportal:gfs4-0.17"
+    image: "otrojota/geoportal:gfs4-0.19"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -18,10 +21,10 @@ services:
         replicas: 1
         restart_policy:
           condition: on-failure
+  ###
+  ### gfs4-server: EXPOSE 8181
   gfs4-server:
-    ports:
-      - "8081:8081"
-    image: "otrojota/geoportal:gfs4-0.17"
+    image: "otrojota/geoportal:gfs4-0.19"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -34,6 +37,8 @@ services:
         replicas: 4
         restart_policy:
           condition: on-failure
+  ###
+  ### mongo
   mongo:
     image: "mongo:4.2.3-bionic"
     volumes:
@@ -55,10 +60,10 @@ services:
     environment:
         MONGO_INITDB_ROOT_USERNAME: root
         MONGO_INITDB_ROOT_PASSWORD: pomeo
+  ###
+  ### servimet-downloader: EXPOSE 8183
   servimet-downloader:
-        ports:
-          - "8083:8083"
-        image: "otrojota/geoportal:servimet-0.15"
+        image: "otrojota/geoportal:servimet-0.17"
         deploy:
             mode: replicated
             replicas: 1
@@ -68,12 +73,48 @@ services:
             MONGO_URL: "mongodb://root:pomeo@mongo:27017"
             MONGO_DATABASE: "servimet"
             DOWNLOADER: "true"
-  web-server:
-    ports:
-      - "8082:8085"
-    image: "otrojota/geoportal:web-server-0.22"
+  ###
+  ### capas-fijas: EXPOSE 8184
+  capas-fijas:
+    image: "otrojota/geoportal:capas-fijas-0.14"
+    volumes:
+      - type: bind
+        source: /var/geoportal/fixed
+        target: /home/data
+      - type: bind
+        source: /var/geoportal/fixed/publish
+        target: /home/publish
     deploy:
         mode: replicated
         replicas: 2
         restart_policy:
           condition: on-failure
+  ###
+  ### web-server: EXPOSE 8180
+  web-server:
+    image: "otrojota/geoportal:web-server-0.25"
+    deploy:
+        mode: replicated
+        replicas: 2
+        restart_policy:
+          condition: on-failure
+  ###
+  ### nginx
+  nginx:
+    ports:
+      - "8082:8082"
+      - "8083:8083"
+    image: "nginx:latest"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+          condition: on-failure
+    volumes:
+      - type: bind
+        source: /opt/geoportal/nginx
+        target: /etc/nginx/conf.d
+
+          
