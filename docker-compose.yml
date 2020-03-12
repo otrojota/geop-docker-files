@@ -6,7 +6,7 @@ services:
   ###
   ### gfs4-downloader
   gfs4-downloader:
-    image: "otrojota/geoportal:gfs4-0.22"
+    image: "otrojota/geoportal:gfs4-0.25"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -24,13 +24,47 @@ services:
   ###
   ### gfs4-server: EXPOSE 8181
   gfs4-server:
-    image: "otrojota/geoportal:gfs4-0.22"
+    image: "otrojota/geoportal:gfs4-0.25"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
         target: /home/data
       - type: bind
         source: /var/geoportal/gfs4/publish
+        target: /home/publish
+    deploy:
+        mode: replicated
+        replicas: 4
+        restart_policy:
+          condition: on-failure
+  ###
+  ### ww3-downloader
+  ww3-downloader:
+    image: "otrojota/geoportal:ww3-0.14"
+    volumes:
+      - type: bind
+        source: /var/geoportal/ww3/data
+        target: /home/data
+      - type: bind
+        source: /var/geoportal/ww3/publish
+        target: /home/publish
+    environment:
+      DOWNLOADER: "true"
+    deploy:
+        mode: replicated
+        replicas: 1
+        restart_policy:
+          condition: on-failure
+  ###
+  ### ww3-server: EXPOSE 8187
+  ww3-server:
+    image: "otrojota/geoportal:ww3-0.14"
+    volumes:
+      - type: bind
+        source: /var/geoportal/ww3/data
+        target: /home/data
+      - type: bind
+        source: /var/geoportal/ww3/publish
         target: /home/publish
     deploy:
         mode: replicated
@@ -63,7 +97,7 @@ services:
   ###
   ### servimet-downloader: EXPOSE 8183
   servimet-downloader:
-        image: "otrojota/geoportal:servimet-0.19"
+        image: "otrojota/geoportal:servimet-0.21"
         deploy:
             mode: replicated
             replicas: 1
@@ -76,7 +110,7 @@ services:
   ###
   ### huinay-downloader: EXPOSE 8186
   huinay-downloader:
-    image: "otrojota/geoportal:huinay-0.13"
+    image: "otrojota/geoportal:huinay-0.16"
     deploy:
         mode: replicated
         replicas: 1
@@ -89,7 +123,7 @@ services:
   ###
   ### capas-fijas: EXPOSE 8184
   capas-fijas:
-    image: "otrojota/geoportal:capas-fijas-0.16"
+    image: "otrojota/geoportal:capas-fijas-0.18"
     volumes:
       - type: bind
         source: /var/geoportal/fixed
@@ -103,14 +137,26 @@ services:
         restart_policy:
           condition: on-failure
   ###
+  ### bcn-server: EXPOSE 8188
+  bcn-server:
+    image: "otrojota/geoportal:bcn-0.10"
+    deploy:
+        mode: replicated
+        replicas: 1
+        restart_policy:
+          condition: on-failure
+  ###
   ### web-server: EXPOSE 8180
   web-server:
-    image: "otrojota/geoportal:web-server-0.27"
+    image: "otrojota/geoportal:web-server-0.37"
     deploy:
         mode: replicated
         replicas: 2
         restart_policy:
           condition: on-failure
+    environment:
+        MONGO_URL: "mongodb://root:pomeo@mongo:27017"
+        MONGO_DATABASE: "geoportal"
   ###
   ### nginx
   nginx:
