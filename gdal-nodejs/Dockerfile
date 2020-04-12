@@ -11,3 +11,4 @@ RUN apt-get install -y python3-pip
 #RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 #RUN ["python", "get-pip.py"]
 RUN ["pip3", "install", "numpy"]
+RUN ["pip3", "install", "motuclient"]
