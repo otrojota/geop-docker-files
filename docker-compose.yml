@@ -1,6 +1,10 @@
 # docker stack ps geoportal
 # docker stack deploy --compose-file docker-compose.yml --with-registry-auth geoportal
 #
+# docker container ls
+#
+#
+
 version: '3.7'
 services:
   ###
@@ -74,7 +78,7 @@ services:
   ###
   ### copernicus-downloader
   copernicus-downloader:
-    image: "otrojota/geoportal:copernicus-0.12"
+    image: "otrojota/geoportal:copernicus-0.17"
     volumes:
       - type: bind
         source: /var/geoportal/copernicus/data
@@ -92,7 +96,7 @@ services:
   ###
   ### copernicus-server: EXPOSE 8189
   copernicus-server:
-    image: "otrojota/geoportal:copernicus-0.12"
+    image: "otrojota/geoportal:copernicus-0.17"
     volumes:
       - type: bind
         source: /var/geoportal/copernicus/data
@@ -182,7 +186,7 @@ services:
   ###
   ### web-server: EXPOSE 8180
   web-server:
-    image: "otrojota/geoportal:web-server-0.40"
+    image: "otrojota/geoportal:web-server-0.43"
     deploy:
         mode: replicated
         replicas: 2
