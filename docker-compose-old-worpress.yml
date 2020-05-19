@@ -2,8 +2,8 @@
 # docker stack deploy --compose-file docker-compose.yml --with-registry-auth geoportal
 #
 # docker container ls
-# docker service logs geoportal_nginx
-# docker service ps --no-trunc geoportal_nginx (para ver errores de servicios que no parten)
+# docker service logs geoportal_wordpress
+# docker service ps --no-trunc geoportal_mysql (para ver errores de servicios que no parten)
 # journalctl -u docker.service | tail -n 50 (para ver otros errores)
 # docker service scale geoportal_nginx=1
 #
@@ -14,7 +14,7 @@ services:
   ###
   ### gfs4-downloader
   gfs4-downloader:
-    image: "otrojota/geoportal:gfs4-0.28"
+    image: "otrojota/geoportal:gfs4-0.27"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -32,7 +32,7 @@ services:
   ###
   ### gfs4-server: EXPOSE 8181
   gfs4-server:
-    image: "otrojota/geoportal:gfs4-0.28"
+    image: "otrojota/geoportal:gfs4-0.27"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -48,7 +48,7 @@ services:
   ###
   ### ww3-downloader
   ww3-downloader:
-    image: "otrojota/geoportal:ww3-0.20"
+    image: "otrojota/geoportal:ww3-0.18"
     volumes:
       - type: bind
         source: /var/geoportal/ww3/data
@@ -66,7 +66,7 @@ services:
   ###
   ### ww3-server: EXPOSE 8187
   ww3-server:
-    image: "otrojota/geoportal:ww3-0.20"
+    image: "otrojota/geoportal:ww3-0.18"
     volumes:
       - type: bind
         source: /var/geoportal/ww3/data
@@ -82,7 +82,7 @@ services:
   ###
   ### copernicus-downloader
   copernicus-downloader:
-    image: "otrojota/geoportal:copernicus-0.19"
+    image: "otrojota/geoportal:copernicus-0.17"
     volumes:
       - type: bind
         source: /var/geoportal/copernicus/data
@@ -100,7 +100,7 @@ services:
   ###
   ### copernicus-server: EXPOSE 8189
   copernicus-server:
-    image: "otrojota/geoportal:copernicus-0.19"
+    image: "otrojota/geoportal:copernicus-0.17"
     volumes:
       - type: bind
         source: /var/geoportal/copernicus/data
@@ -113,18 +113,6 @@ services:
         replicas: 3
         restart_policy:
           condition: on-failure
-  ###
-  ### minz: EXPOSE 8183
-  minz:
-    image: "otrojota/geoportal:minz-0.11"
-    deploy:
-        mode: replicated
-        replicas: 1
-        restart_policy:
-            condition: on-failure
-    environment:
-        MONGO_URL: "mongodb://root:pomeo@mongo:27017"
-        MONGO_DATABASE: "minz"
   ###
   ### mongo
   mongo:
@@ -151,7 +139,7 @@ services:
   ###
   ### servimet-downloader: EXPOSE 8183
   servimet-downloader:
-        image: "otrojota/geoportal:servimet-0.23"
+        image: "otrojota/geoportal:servimet-0.21"
         deploy:
             mode: replicated
             replicas: 1
@@ -164,7 +152,7 @@ services:
   ###
   ### huinay-downloader: EXPOSE 8186
   huinay-downloader:
-    image: "otrojota/geoportal:huinay-0.17"
+    image: "otrojota/geoportal:huinay-0.16"
     deploy:
         mode: replicated
         replicas: 1
@@ -177,7 +165,7 @@ services:
   ###
   ### capas-fijas: EXPOSE 8184
   capas-fijas:
-    image: "otrojota/geoportal:capas-fijas-0.22"
+    image: "otrojota/geoportal:capas-fijas-0.20"
     volumes:
       - type: bind
         source: /var/geoportal/fixed
@@ -193,16 +181,7 @@ services:
   ###
   ### bcn-server: EXPOSE 8188
   bcn-server:
-    image: "otrojota/geoportal:bcn-0.11"
-    deploy:
-        mode: replicated
-        replicas: 1
-        restart_policy:
-          condition: on-failure
-  ###
-  ### fipa-fan-2019: EXPOSE 8190
-  fipa-fan-2019:
-    image: "otrojota/geoportal:fipa-fan-2019-0.11"
+    image: "otrojota/geoportal:bcn-0.10"
     deploy:
         mode: replicated
         replicas: 1
@@ -211,7 +190,7 @@ services:
   ###
   ### web-server: EXPOSE 8180
   web-server:
-    image: "otrojota/geoportal:web-server-0.47"
+    image: "otrojota/geoportal:web-server-0.43"
     deploy:
         mode: replicated
         replicas: 2
@@ -220,6 +199,36 @@ services:
     environment:
         MONGO_URL: "mongodb://root:pomeo@mongo:27017"
         MONGO_DATABASE: "geoportal"
+  ###
+  ### wordpress
+  wordpress:
+    image: wordpress:php7.2-fpm
+    restart: always    
+    #ports:
+    #  - 8120:9000
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: geoportal
+      WORDPRESS_DB_PASSWORD: portalgeo
+      WORDPRESS_DB_NAME: wordressdb
+    volumes:
+      - type: bind
+        source: /var/geoportal/wordpress/html
+        target: /var/www/html
+  ##
+  ## mysql (usada por wordpress)
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordressdb
+      MYSQL_USER: geoportal
+      MYSQL_PASSWORD: portalgeo
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - type: bind
+        source: /var/geoportal/mysql
+        target: /var/lib/mysql
   ###
   ### nginx
   nginx:
