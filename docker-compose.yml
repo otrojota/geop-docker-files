@@ -14,7 +14,7 @@ services:
   ###
   ### gfs4-downloader
   gfs4-downloader:
-    image: "otrojota/geoportal:gfs4-0.28"
+    image: "otrojota/geoportal:gfs4-0.30"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -32,7 +32,7 @@ services:
   ###
   ### gfs4-server: EXPOSE 8181
   gfs4-server:
-    image: "otrojota/geoportal:gfs4-0.28"
+    image: "otrojota/geoportal:gfs4-0.30"
     volumes:
       - type: bind
         source: /var/geoportal/gfs4/data
@@ -48,7 +48,7 @@ services:
   ###
   ### ww3-downloader
   ww3-downloader:
-    image: "otrojota/geoportal:ww3-0.20"
+    image: "otrojota/geoportal:ww3-0.21"
     volumes:
       - type: bind
         source: /var/geoportal/ww3/data
@@ -66,7 +66,7 @@ services:
   ###
   ### ww3-server: EXPOSE 8187
   ww3-server:
-    image: "otrojota/geoportal:ww3-0.20"
+    image: "otrojota/geoportal:ww3-0.21"
     volumes:
       - type: bind
         source: /var/geoportal/ww3/data
@@ -82,7 +82,7 @@ services:
   ###
   ### copernicus-downloader
   copernicus-downloader:
-    image: "otrojota/geoportal:copernicus-0.19"
+    image: "otrojota/geoportal:copernicus-0.20"
     volumes:
       - type: bind
         source: /var/geoportal/copernicus/data
@@ -100,7 +100,7 @@ services:
   ###
   ### copernicus-server: EXPOSE 8189
   copernicus-server:
-    image: "otrojota/geoportal:copernicus-0.19"
+    image: "otrojota/geoportal:copernicus-0.20"
     volumes:
       - type: bind
         source: /var/geoportal/copernicus/data
@@ -151,7 +151,7 @@ services:
   ###
   ### servimet-downloader: EXPOSE 8183
   servimet-downloader:
-        image: "otrojota/geoportal:servimet-0.23"
+        image: "otrojota/geoportal:servimet-0.27"
         deploy:
             mode: replicated
             replicas: 1
