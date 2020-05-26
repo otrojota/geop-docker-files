@@ -6,7 +6,10 @@
 # docker service ps --no-trunc geoportal_nginx (para ver errores de servicios que no parten)
 # journalctl -u docker.service | tail -n 50 (para ver otros errores)
 # docker service scale geoportal_nginx=1
-#
+# docker top container-id  (para ver procesos corriendo en un container)
+# docker stack services geoportal (para ver y obtener service-id)
+# docker service update --force service-id (para reiniciar un servicio)
+# docker stats container-id 
 #
 
 version: '3.7'
@@ -116,7 +119,7 @@ services:
   ###
   ### minz: EXPOSE 8183
   minz:
-    image: "otrojota/geoportal:minz-0.11"
+    image: "otrojota/geoportal:minz-0.13"
     deploy:
         mode: replicated
         replicas: 1
@@ -140,11 +143,6 @@ services:
           constraints: [node.role == manager]
         restart_policy:
             condition: on-failure
-        resources:
-            reservations:
-                memory: 512M
-            limits:
-                memory: 4096M
     environment:
         MONGO_INITDB_ROOT_USERNAME: root
         MONGO_INITDB_ROOT_PASSWORD: pomeo
@@ -202,7 +200,7 @@ services:
   ###
   ### fipa-fan-2019: EXPOSE 8190
   fipa-fan-2019:
-    image: "otrojota/geoportal:fipa-fan-2019-0.11"
+    image: "otrojota/geoportal:fipa-fan-2019-0.16"
     deploy:
         mode: replicated
         replicas: 1
@@ -211,7 +209,7 @@ services:
   ###
   ### web-server: EXPOSE 8180
   web-server:
-    image: "otrojota/geoportal:web-server-0.47"
+    image: "otrojota/geoportal:web-server-0.49"
     deploy:
         mode: replicated
         replicas: 2
