@@ -237,7 +237,7 @@ services:
   ###
   ### web-server: EXPOSE 8180
   web-server:
-    image: "otrojota/geoportal:web-server-0.59"
+    image: "otrojota/geoportal:web-server-0.62"
     deploy:
         mode: replicated
         replicas: 2
